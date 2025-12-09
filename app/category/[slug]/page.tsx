@@ -1,14 +1,18 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
 import { getNotionArticles, NotionArticle } from '@/lib/notion/client';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ArticleCard } from '@/components/ArticleCard';
 import { MainLayout } from '@/components/MainLayout';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
+import { CategoryKey } from '@/lib/i18n/dictionaries';
 
-export default function Home() {
+export default function CategoryPage() {
+  const params = useParams();
+  const category = params.slug as CategoryKey;
   const { locale, dictionary } = useLanguage();
   const [articles, setArticles] = useState<NotionArticle[]>([]);
   const [filteredArticles, setFilteredArticles] = useState<NotionArticle[]>([]);
@@ -17,7 +21,7 @@ export default function Home() {
 
   useEffect(() => {
     loadArticles();
-  }, []);
+  }, [category]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -36,7 +40,7 @@ export default function Home() {
   const loadArticles = async () => {
     setLoading(true);
     try {
-      const data = await getNotionArticles('all');
+      const data = await getNotionArticles(category);
       setArticles(data);
       setFilteredArticles(data);
     } catch (error) {
@@ -52,7 +56,7 @@ export default function Home() {
         <div className="max-w-5xl mx-auto space-y-8">
           <div className="space-y-4">
             <h1 className="text-3xl md:text-4xl font-bold">
-              {dictionary.sidebar.allCategories}
+              {dictionary.categories[category]}
             </h1>
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />

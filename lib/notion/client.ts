@@ -1,3 +1,5 @@
+import { CategoryKey } from '@/lib/i18n/dictionaries';
+
 export interface NotionArticle {
   id: string;
   title: string;
@@ -8,18 +10,39 @@ export interface NotionArticle {
   tags: string[];
   author: string;
   language: string;
+  category: CategoryKey;
 }
 
-export async function getNotionArticles(locale?: string): Promise<NotionArticle[]> {
+export async function getNotionArticles(category?: CategoryKey, locale?: string): Promise<NotionArticle[]> {
   const notionToken = process.env.NEXT_PUBLIC_NOTION_TOKEN;
   const databaseId = process.env.NEXT_PUBLIC_NOTION_DATABASE_ID;
 
   if (!notionToken || !databaseId) {
     console.warn('Notion credentials not configured. Using mock data.');
-    return getMockArticles(locale);
+    return getMockArticles(category, locale);
   }
 
   try {
+    const filters: any[] = [];
+
+    if (category && category !== 'all') {
+      filters.push({
+        property: 'Category',
+        select: {
+          equals: category,
+        },
+      });
+    }
+
+    if (locale) {
+      filters.push({
+        property: 'Language',
+        select: {
+          equals: locale,
+        },
+      });
+    }
+
     const response = await fetch(`https://api.notion.com/v1/databases/${databaseId}/query`, {
       method: 'POST',
       headers: {
@@ -28,12 +51,9 @@ export async function getNotionArticles(locale?: string): Promise<NotionArticle[
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        filter: locale ? {
-          property: 'Language',
-          select: {
-            equals: locale,
-          },
-        } : undefined,
+        filter: filters.length > 0 ? (filters.length === 1 ? filters[0] : {
+          and: filters,
+        }) : undefined,
         sorts: [
           {
             property: 'Published Date',
@@ -52,7 +72,7 @@ export async function getNotionArticles(locale?: string): Promise<NotionArticle[
     return data.results.map((page: any) => parseNotionPage(page));
   } catch (error) {
     console.error('Error fetching from Notion:', error);
-    return getMockArticles(locale);
+    return getMockArticles(category, locale);
   }
 }
 
@@ -106,10 +126,11 @@ function parseNotionPage(page: any): NotionArticle {
     tags: properties.Tags?.multi_select?.map((tag: any) => tag.name) || [],
     author: properties.Author?.rich_text?.[0]?.plain_text || 'Unknown',
     language: properties.Language?.select?.name || 'en',
+    category: (properties.Category?.select?.name || 'carbon') as CategoryKey,
   };
 }
 
-function getMockArticles(locale?: string): NotionArticle[] {
+function getMockArticles(category?: CategoryKey, locale?: string): NotionArticle[] {
   const articles: NotionArticle[] = [
     {
       id: '1',
@@ -121,6 +142,7 @@ function getMockArticles(locale?: string): NotionArticle[] {
       tags: ['Quantum Computing', 'Innovation', 'Technology'],
       author: 'Dr. Sarah Chen',
       language: 'en',
+      category: 'carbon',
     },
     {
       id: '2',
@@ -132,6 +154,7 @@ function getMockArticles(locale?: string): NotionArticle[] {
       tags: ['AI', 'Healthcare', 'Biotechnology'],
       author: 'Prof. Michael Johnson',
       language: 'en',
+      category: 'engineering-plastics',
     },
     {
       id: '3',
@@ -143,6 +166,7 @@ function getMockArticles(locale?: string): NotionArticle[] {
       tags: ['Energy', 'Battery', 'Electric Vehicles'],
       author: '田中 博士',
       language: 'ja',
+      category: 'battery',
     },
     {
       id: '4',
@@ -154,6 +178,7 @@ function getMockArticles(locale?: string): NotionArticle[] {
       tags: ['Renewable Energy', 'Sustainability', 'Innovation'],
       author: 'Dr. Emily Rodriguez',
       language: 'en',
+      category: 'carbon',
     },
     {
       id: '5',
@@ -165,6 +190,7 @@ function getMockArticles(locale?: string): NotionArticle[] {
       tags: ['AI', 'Hardware', 'Edge Computing'],
       author: '王博士',
       language: 'zh',
+      category: 'metal-processing',
     },
     {
       id: '6',
@@ -176,6 +202,7 @@ function getMockArticles(locale?: string): NotionArticle[] {
       tags: ['Environment', 'Materials Science', 'Sustainability'],
       author: 'Dr. James Wilson',
       language: 'en',
+      category: 'engineering-plastics',
     },
     {
       id: '7',
@@ -187,6 +214,7 @@ function getMockArticles(locale?: string): NotionArticle[] {
       tags: ['Autonomous Vehicles', 'AI', 'Safety'],
       author: '佐藤 博士',
       language: 'ja',
+      category: 'battery',
     },
     {
       id: '8',
@@ -198,12 +226,43 @@ function getMockArticles(locale?: string): NotionArticle[] {
       tags: ['Blockchain', 'Privacy', 'Cryptography'],
       author: '李博士',
       language: 'zh',
+      category: 'carbon',
+    },
+    {
+      id: '9',
+      title: 'Advanced Metal Alloy Patent',
+      description: 'New high-strength, lightweight metal alloy for aerospace applications receives patent approval.',
+      content: 'A groundbreaking metal alloy patent has been approved for a material that combines exceptional strength with significantly reduced weight. This innovation is set to revolutionize aerospace and automotive industries.\n\nThe new alloy incorporates nano-structured elements that enhance mechanical properties while reducing overall density by 30% compared to traditional aerospace-grade materials. This weight reduction translates directly to improved fuel efficiency and increased payload capacity.\n\nExtensive testing has demonstrated that the alloy maintains its structural integrity under extreme temperatures ranging from -200°C to 1000°C, making it ideal for both atmospheric and space applications. Its corrosion resistance is also superior to existing materials.\n\nMajor aerospace manufacturers have already signed preliminary agreements to incorporate this alloy into next-generation aircraft designs. The technology is expected to contribute to a 15-20% improvement in fuel efficiency for commercial aircraft.',
+      coverImage: 'https://images.pexels.com/photos/1267321/pexels-photo-1267321.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      publishedDate: '2025-10-28',
+      tags: ['Metal Processing', 'Aerospace', 'Materials'],
+      author: 'Dr. Robert Martinez',
+      language: 'en',
+      category: 'metal-processing',
+    },
+    {
+      id: '10',
+      title: 'カーボンナノチューブ複合材料の特許',
+      description: '高強度カーボンナノチューブ複合材料の新製造技術が特許取得。建築・自動車分野での応用に期待。',
+      content: 'カーボンナノチューブを用いた革新的な複合材料の製造技術が特許を取得しました。この技術により、従来材料と比較して10倍の強度を持つ軽量材料の大量生産が可能になります。\n\n新しい製造プロセスは、カーボンナノチューブの配向を精密に制御することで、材料の機械的特性を最適化します。これにより、建築構造物の軽量化や自動車の燃費向上に大きく貢献できます。\n\n実験では、この複合材料が鋼鉄の5分の1の重量で同等の強度を実現することが確認されています。また、耐腐食性にも優れており、過酷な環境下での使用にも適しています。\n\n建設会社や自動車メーカーからの関心が高く、2026年から本格的な商業生産が開始される予定です。',
+      coverImage: 'https://images.pexels.com/photos/2882566/pexels-photo-2882566.jpeg?auto=compress&cs=tinysrgb&w=1200',
+      publishedDate: '2025-10-20',
+      tags: ['Carbon', 'Nanotechnology', 'Composite Materials'],
+      author: '山田 博士',
+      language: 'ja',
+      category: 'carbon',
     },
   ];
 
-  if (locale) {
-    return articles.filter(article => article.language === locale);
+  let filtered = articles;
+
+  if (category && category !== 'all') {
+    filtered = filtered.filter(article => article.category === category);
   }
 
-  return articles;
+  if (locale) {
+    filtered = filtered.filter(article => article.language === locale);
+  }
+
+  return filtered;
 }

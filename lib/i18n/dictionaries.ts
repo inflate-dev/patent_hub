@@ -1,5 +1,7 @@
 export type Locale = 'en' | 'ja' | 'zh';
 
+export type CategoryKey = 'all' | 'carbon' | 'battery' | 'engineering-plastics' | 'metal-processing';
+
 export interface Dictionary {
   nav: {
     home: string;
@@ -8,6 +10,7 @@ export interface Dictionary {
     signup: string;
     logout: string;
     profile: string;
+    categories: string;
   };
   auth: {
     email: string;
@@ -43,6 +46,17 @@ export interface Dictionary {
     readMore: string;
     publishedOn: string;
   };
+  categories: {
+    all: string;
+    carbon: string;
+    battery: string;
+    'engineering-plastics': string;
+    'metal-processing': string;
+  };
+  sidebar: {
+    title: string;
+    allCategories: string;
+  };
   profile: {
     title: string;
     preferredLanguage: string;
@@ -65,6 +79,7 @@ const en: Dictionary = {
     signup: 'Sign Up',
     logout: 'Logout',
     profile: 'Profile',
+    categories: 'Categories',
   },
   auth: {
     email: 'Email',
@@ -100,6 +115,17 @@ const en: Dictionary = {
     readMore: 'Read More',
     publishedOn: 'Published on',
   },
+  categories: {
+    all: 'All Categories',
+    carbon: 'Carbon Technology',
+    battery: 'Battery Innovation',
+    'engineering-plastics': 'Engineering Plastics',
+    'metal-processing': 'Metal Processing',
+  },
+  sidebar: {
+    title: 'Categories',
+    allCategories: 'All Categories',
+  },
   profile: {
     title: 'Profile Settings',
     preferredLanguage: 'Preferred Language',
@@ -122,6 +148,7 @@ const ja: Dictionary = {
     signup: '新規登録',
     logout: 'ログアウト',
     profile: 'プロフィール',
+    categories: 'カテゴリー',
   },
   auth: {
     email: 'メールアドレス',
@@ -157,6 +184,17 @@ const ja: Dictionary = {
     readMore: '続きを読む',
     publishedOn: '公開日',
   },
+  categories: {
+    all: 'すべてのカテゴリー',
+    carbon: 'カーボン技術',
+    battery: 'バッテリー革新',
+    'engineering-plastics': 'エンジニアリングプラスチック',
+    'metal-processing': '金属加工',
+  },
+  sidebar: {
+    title: 'カテゴリー',
+    allCategories: 'すべてのカテゴリー',
+  },
   profile: {
     title: 'プロフィール設定',
     preferredLanguage: '優先言語',
@@ -179,6 +217,7 @@ const zh: Dictionary = {
     signup: '注册',
     logout: '登出',
     profile: '个人资料',
+    categories: '分类',
   },
   auth: {
     email: '电子邮件',
@@ -214,6 +253,17 @@ const zh: Dictionary = {
     readMore: '阅读更多',
     publishedOn: '发布于',
   },
+  categories: {
+    all: '全部分类',
+    carbon: '碳技术',
+    battery: '电池创新',
+    'engineering-plastics': '工程塑料',
+    'metal-processing': '金属加工',
+  },
+  sidebar: {
+    title: '分类',
+    allCategories: '全部分类',
+  },
   profile: {
     title: '个人资料设置',
     preferredLanguage: '首选语言',
@@ -245,3 +295,5 @@ export const localeNames: Record<Locale, string> = {
   ja: '日本語',
   zh: '中文',
 };
+
+export const categoryKeys: CategoryKey[] = ['all', 'carbon', 'battery', 'engineering-plastics', 'metal-processing'];
