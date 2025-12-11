@@ -56,6 +56,8 @@ export interface Dictionary {
   sidebar: {
     title: string;
     allCategories: string;
+    relatedArticles: string;
+    noArticles: string;
   };
   profile: {
     title: string;
@@ -125,6 +127,8 @@ const en: Dictionary = {
   sidebar: {
     title: 'Categories',
     allCategories: 'All Categories',
+    relatedArticles: 'Related Articles',
+    noArticles: 'No articles available',
   },
   profile: {
     title: 'Profile Settings',
@@ -194,6 +198,8 @@ const ja: Dictionary = {
   sidebar: {
     title: 'カテゴリー',
     allCategories: 'すべてのカテゴリー',
+    relatedArticles: '関連記事',
+    noArticles: '利用可能な記事はありません',
   },
   profile: {
     title: 'プロフィール設定',
@@ -263,6 +269,8 @@ const zh: Dictionary = {
   sidebar: {
     title: '分类',
     allCategories: '全部分类',
+    relatedArticles: '相关文章',
+    noArticles: '暂无文章',
   },
   profile: {
     title: '个人资料设置',

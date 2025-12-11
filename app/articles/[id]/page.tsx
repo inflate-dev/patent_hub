@@ -5,12 +5,14 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getNotionArticle, NotionArticle } from '@/lib/notion/client';
+import { getNotionArticle, getNotionArticles, NotionArticle } from '@/lib/notion/client';
 import { canViewArticle, addViewedArticle, getViewedArticlesCount } from '@/lib/articleViews';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { ArticleRestrictionScreen } from '@/components/ArticleRestrictionScreen';
+import { ArticleSidebar } from '@/components/ArticleSidebar';
+import { MobileArticleSidebar } from '@/components/MobileArticleSidebar';
 import { ArrowLeft, Calendar, User } from 'lucide-react';
 import Link from 'next/link';
 
@@ -18,8 +20,9 @@ export default function ArticlePage() {
   const router = useRouter();
   const params = useParams();
   const { user, loading: authLoading } = useAuth();
-  const { locale } = useLanguage();
+  const { locale, dictionary } = useLanguage();
   const [article, setArticle] = useState<NotionArticle | null>(null);
+  const [relatedArticles, setRelatedArticles] = useState<NotionArticle[]>([]);
   const [loading, setLoading] = useState(true);
   const [canView, setCanView] = useState(false);
 
@@ -39,6 +42,11 @@ export default function ArticlePage() {
       try {
         const data = await getNotionArticle(id);
         setArticle(data);
+
+        if (data) {
+          const related = await getNotionArticles(data.category, locale);
+          setRelatedArticles(related);
+        }
 
         if (!user) {
           addViewedArticle(id);
@@ -66,10 +74,10 @@ export default function ArticlePage() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
         <div className="container mx-auto px-4 py-12">
-          <Link href="/">
+          <Link href={article?.category ? `/category/${article.category}` : '/'}>
             <Button variant="ghost" className="mb-6">
               <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
+              {article?.category ? dictionary.categories[article.category] : 'Back to Home'}
             </Button>
           </Link>
           <ArticleRestrictionScreen />
@@ -105,16 +113,35 @@ export default function ArticlePage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto space-y-8">
-          <Link href="/">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Home
-            </Button>
-          </Link>
+      <div className="flex">
+        <div className="hidden lg:block">
+          <ArticleSidebar
+            articles={relatedArticles}
+            currentArticleId={article.id}
+            categoryName={dictionary.categories[article.category]}
+          />
+        </div>
 
-          <Card className="overflow-hidden">
+        <div className="flex-1 container mx-auto px-4 py-12">
+          <div className="max-w-4xl mx-auto space-y-8">
+            <div className="flex items-center gap-4">
+              <Link href={`/category/${article.category}`}>
+                <Button variant="ghost" className="mb-4">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  {dictionary.categories[article.category]}
+                </Button>
+              </Link>
+
+              <div className="mb-4">
+                <MobileArticleSidebar
+                  articles={relatedArticles}
+                  currentArticleId={article.id}
+                  categoryName={dictionary.categories[article.category]}
+                />
+              </div>
+            </div>
+
+            <Card className="overflow-hidden">
             <div className="relative w-full h-96">
               <Image
                 src={article.coverImage}
@@ -183,6 +210,7 @@ export default function ArticlePage() {
               )}
             </CardContent>
           </Card>
+          </div>
         </div>
       </div>
     </div>
