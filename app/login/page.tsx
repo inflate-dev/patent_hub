@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { signIn } from '@/lib/supabase/auth';
+import { useAppStore } from '@/lib/store';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,17 +18,40 @@ export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const setUser = useAppStore((state) => state.setUser);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
 
     try {
-      await signIn(email, password);
+      // ✅ ログイン処理
+      const login = async () => {
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ email, password }),
+        })
+        const result = await res.json();
+        const { session } = result;
+      if (session) {
+          const { access_token, user } = session;
+          if (user) {
+            setUser({id: user.id, email: user.email, token: access_token, name: user.name});
+            localStorage.setItem('loginTime', Date.now().toString()) 
+          }
+        }
+      }
+      
       toast({
         title: dictionary.common.success,
         description: dictionary.common.welcome,
       });
+      login();
       router.push('/');
       router.refresh();
     } catch (error: any) {
@@ -51,7 +74,7 @@ export default function LoginPage() {
             {dictionary.auth.email}
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="email">{dictionary.auth.email}</Label>

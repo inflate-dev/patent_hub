@@ -17,7 +17,6 @@ import { ArrowLeft, Calendar, User } from 'lucide-react';
 import Link from 'next/link';
 
 export default function ArticlePage() {
-  const router = useRouter();
   const params = useParams();
   const { user, loading: authLoading } = useAuth();
   const { locale, dictionary } = useLanguage();
