@@ -1,29 +1,21 @@
-'use client';
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+'use client'
 
-interface User {
-  id: string;
-  email: string;
-  token: string;
-  name: string;
+import { create } from 'zustand'
+
+interface UserUI {
+  id: string
+  email: string
+  name: string
 }
 
 interface AppState {
-  user: User | null;
-  setUser: (user: User) => void;
-  clearUser: () => void;
+  user: UserUI | null
+  setUser: (user: UserUI | null) => void
+  clearUser: () => void
 }
 
-export const useAppStore = create<AppState>()(
-  persist(
-    (set) => ({
-      user: null,
-      setUser: (user: User) => set({ user }),
-      clearUser: () => set({ user: null }),
-    }),
-    {
-      name: 'user-storage', // localStorage に保存されるキー名
-    }
-  )
-);
+export const useAppStore = create<AppState>((set) => ({
+  user: null,
+  setUser: (user) => set({ user }),
+  clearUser: () => set({ user: null }),
+}))

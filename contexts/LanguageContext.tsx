@@ -1,45 +1,83 @@
-'use client';
+'use client'
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { Locale, getDictionary, Dictionary } from '@/lib/i18n/dictionaries';
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
+import { Locale, getDictionary, Dictionary } from '@/lib/i18n/dictionaries'
 
 interface LanguageContextType {
-  locale: Locale;
-  setLocale: (locale: Locale) => void;
-  dictionary: Dictionary;
+  locale: Locale
+  setLocale: (locale: Locale) => void
+  dictionary: Dictionary
 }
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+const LanguageContext = createContext<LanguageContextType | null>(null)
 
-export function LanguageProvider({ children }: { children: React.ReactNode }) {
-  const [locale, setLocaleState] = useState<Locale>('en');
-  const [dictionary, setDictionary] = useState<Dictionary>(getDictionary('en'));
+const SUPPORTED_LOCALES: readonly Locale[] = ['en', 'ja', 'zh']
 
+export function LanguageProvider({
+  children,
+}: {
+  children: React.ReactNode
+}) {
+  const [locale, setLocale] = useState<Locale>('en')
+  const [dictionary, setDictionary] = useState<Dictionary>(
+    getDictionary('en')
+  )
+  const [mounted, setMounted] = useState(false)
+
+  // Client マウント後に localStorage を反映
   useEffect(() => {
-    const savedLocale = localStorage.getItem('locale') as Locale;
-    if (savedLocale && ['en', 'ja', 'zh'].includes(savedLocale)) {
-      setLocaleState(savedLocale);
-      setDictionary(getDictionary(savedLocale));
-    }
-  }, []);
+    const savedLocale = localStorage.getItem('locale')
 
-  const setLocale = (newLocale: Locale) => {
-    setLocaleState(newLocale);
-    setDictionary(getDictionary(newLocale));
-    localStorage.setItem('locale', newLocale);
-  };
+    if (
+      savedLocale &&
+      SUPPORTED_LOCALES.includes(savedLocale as Locale)
+    ) {
+      const validLocale = savedLocale as Locale
+      setLocale(validLocale)
+      setDictionary(getDictionary(validLocale))
+    }
+
+    setMounted(true)
+  }, [])
+
+  const changeLocale = (newLocale: Locale) => {
+    setLocale(newLocale)
+    setDictionary(getDictionary(newLocale))
+    localStorage.setItem('locale', newLocale)
+  }
+
+  /**
+   * 初期マウント前は children を描画しないことで
+   * 「en → ja に切り替わるチラつき」を防ぐ
+   */
+  if (!mounted) {
+    return null
+  }
 
   return (
-    <LanguageContext.Provider value={{ locale, setLocale, dictionary }}>
+    <LanguageContext.Provider
+      value={{
+        locale,
+        setLocale: changeLocale,
+        dictionary,
+      }}
+    >
       {children}
     </LanguageContext.Provider>
-  );
+  )
 }
 
 export function useLanguage() {
-  const context = useContext(LanguageContext);
-  if (context === undefined) {
-    throw new Error('useLanguage must be used within a LanguageProvider');
+  const context = useContext(LanguageContext)
+  if (!context) {
+    throw new Error(
+      'useLanguage must be used within a LanguageProvider'
+    )
   }
-  return context;
+  return context
 }

@@ -1,48 +1,50 @@
 // middleware.ts
-import { createClient } from '@supabase/supabase-js'
-import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { createServerClient } from '@supabase/ssr'
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
 
-  const supabase = createClient(
+  const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
-      auth: {
-        storage: {
-          getItem: (key) => Promise.resolve(req.cookies.get(key)?.value ?? null),
-          setItem: (key, value) => {
-            res.cookies.set(key, value)
-            return Promise.resolve()
-          },
-          removeItem: (key) => {
-            res.cookies.delete(key)
-            return Promise.resolve()
-          },
+      cookies: {
+        getAll() {
+          return req.cookies.getAll()
         },
-        autoRefreshToken: false,
-        persistSession: false,
-        detectSessionInUrl: false,
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => {
+            res.cookies.set(name, value, options)
+          })
+        },
       },
     }
   )
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession()
+    data: { user },
+  } = await supabase.auth.getUser()
 
+  const pathname = req.nextUrl.pathname
+
+  // 🔒 保護したいルート
   const protectedRoutes = ['/articles']
+
   const isProtectedRoute = protectedRoutes.some((route) =>
-    req.nextUrl.pathname.startsWith(route)
+    pathname.startsWith(route)
   )
 
-  if (isProtectedRoute && !session) {
+  // 未ログインで保護ルート → リダイレクト
+  if (isProtectedRoute && !user) {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
-  if (req.nextUrl.pathname === '/login' && session) {
+  // ログイン済みで login / signup → トップへ
+  if (
+    user &&
+    (pathname === '/login' || pathname === '/signup')
+  ) {
     return NextResponse.redirect(new URL('/', req.url))
   }
 
