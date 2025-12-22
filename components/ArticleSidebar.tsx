@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { NotionArticle } from '@/lib/notion/client';
+import { NotionArticle } from '@/lib/notion/types';
 import { cn } from '@/lib/utils';
 import { FileText } from 'lucide-react';
 
