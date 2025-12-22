@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { useAuth } from '@/contexts/AuthContext';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { getNotionArticle, getNotionArticles, NotionArticle } from '@/lib/notion/client';
+import { NotionArticle } from '@/lib/notion/types';
 import { canViewArticle, addViewedArticle, getViewedArticlesCount } from '@/lib/articleViews';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -39,11 +39,16 @@ export default function ArticlePage() {
 
     if (hasAccess) {
       try {
-        const data = await getNotionArticle(id);
+        const res = await fetch(`/api/articles/${id}`);
+        if (!res.ok) {
+          throw new Error('Not found');
+        }
+        const data = await res.json();
         setArticle(data);
 
         if (data) {
-          const related = await getNotionArticles(data.category, locale);
+          const relatedRes = await fetch(`/api/articles?category=${data.category}&locale=${locale}`);
+          const related = await relatedRes.json();
           setRelatedArticles(related);
         }
 

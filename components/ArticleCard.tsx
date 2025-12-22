@@ -1,9 +1,9 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { NotionArticle } from '@/lib/notion/client';
+import { NotionArticle } from '@/lib/notion/types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Calendar } from 'lucide-react';
+import { Calendar, Folder  } from 'lucide-react';
 
 interface ArticleCardProps {
   article: NotionArticle;
@@ -54,12 +54,12 @@ export function ArticleCard({ article, locale }: ArticleCardProps) {
             </div>
 
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <Folder className="h-4 w-4 text-muted-foreground" />
+              <span>{article.category}</span>
               <div className="flex items-center gap-1">
                 <Calendar className="h-4 w-4" />
                 {formattedDate}
               </div>
-              <span>•</span>
-              <span>{article.author}</span>
             </div>
           </div>
         </div>

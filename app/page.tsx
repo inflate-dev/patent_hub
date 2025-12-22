@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { getNotionArticles, NotionArticle } from '@/lib/notion/client';
+import { NotionArticle } from '@/lib/notion/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ArticleCard } from '@/components/ArticleCard';
 import { MainLayout } from '@/components/MainLayout';
@@ -16,7 +16,31 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let isMounted = true;
+
+    const loadArticles = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch('/api/articles');
+        const data: NotionArticle[] = await res.json();
+        if (isMounted) {
+          setArticles(data);
+          setFilteredArticles(data);
+        }
+      } catch (error) {
+        console.error('Error loading articles:', error);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
     loadArticles();
+
+    return () => {
+      isMounted = false; // アンマウント時に中断
+    };
   }, []);
 
   useEffect(() => {
@@ -32,19 +56,6 @@ export default function Home() {
       setFilteredArticles(articles);
     }
   }, [searchQuery, articles]);
-
-  const loadArticles = async () => {
-    setLoading(true);
-    try {
-      const data = await getNotionArticles('all');
-      setArticles(data);
-      setFilteredArticles(data);
-    } catch (error) {
-      console.error('Error loading articles:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <MainLayout>

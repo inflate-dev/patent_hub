@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { getNotionArticles, NotionArticle } from '@/lib/notion/client';
+import { NotionArticle } from '@/lib/notion/types';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { ArticleCard } from '@/components/ArticleCard';
 import { MainLayout } from '@/components/MainLayout';
@@ -20,8 +20,9 @@ export default function CategoryPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+  if (!category || !locale) return;
     loadArticles();
-  }, [category]);
+  }, [category, locale]);
 
   useEffect(() => {
     if (searchQuery) {
@@ -40,7 +41,9 @@ export default function CategoryPage() {
   const loadArticles = async () => {
     setLoading(true);
     try {
-      const data = await getNotionArticles(category);
+      const res = await fetch(`/api/articles?category=${category}&locale=${locale}`);
+      if (!res.ok) throw new Error('Failed to fetch articles');
+      const data: NotionArticle[] = await res.json();
       setArticles(data);
       setFilteredArticles(data);
     } catch (error) {

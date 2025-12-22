@@ -31,6 +31,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# # Python 仮想環境
+.venv/
+venv/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
