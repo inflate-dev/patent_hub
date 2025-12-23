@@ -11,21 +11,12 @@ export async function fetchNotionArticles(
 ): Promise<NotionArticle[]> {
   if (!notionToken || !databaseId) return [];
 
-  const filters: any[] = [];
-
-  if (category && category !== 'all') {
-    filters.push({
-      property: 'Category',
-      select: { equals: category },
-    });
-  }
-
-  if (locale) {
-    filters.push({
-      property: 'Language',
-      select: { equals: locale },
-    });
-  }
+  const filter = category && category !== 'all'
+    ? {
+        property: 'Category',
+        select: { equals: category },
+      }
+    : undefined;
 
   const res = await fetch(
     `https://api.notion.com/v1/databases/${databaseId}/query`,
@@ -37,15 +28,10 @@ export async function fetchNotionArticles(
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        filter:
-          filters.length === 0
-            ? undefined
-            : filters.length === 1
-            ? filters[0]
-            : { and: filters },
+        filter,
         sorts: [
           {
-            property: 'Published Date',
+            property: 'FilingDate',
             direction: 'descending',
           },
         ],
@@ -73,9 +59,9 @@ export async function getNotionArticle(pageId: string): Promise<NotionArticle | 
       },
       body: JSON.stringify({
         filter: {
-          property: 'Title',
-          title: {
-            is_not_empty: true, // ← 全件取得のためのダミー条件
+          property: 'Category',
+          select: {
+            is_not_empty: true,
           },
         },
       }),
@@ -101,24 +87,24 @@ export async function getNotionArticle(pageId: string): Promise<NotionArticle | 
 function parseNotionPage(page: any): NotionArticle {
   const p = page.properties;
 
-  const titleData = p.Title?.rich_text?.[0]?.plain_text ? JSON.parse(p.Title.rich_text[0].plain_text) : { ja: '', en: '', zh: '' };
-  const summaryData = p.Summary?.rich_text?.[0]?.plain_text ? JSON.parse(p.Summary.rich_text[0].plain_text) : {
-    ja: { overview: '', properties: [] },
-    en: { overview: '', properties: [] },
-    zh: { overview: '', properties: [] }
+  const parsePropertiesField = (field: any): string[] => {
+    if (!field) return [];
+    const text = field.rich_text?.[0]?.plain_text ?? '';
+    if (!text) return [];
+    return text.split('\n').filter((line: string) => line.trim() !== '');
   };
 
   return {
     id: page.id,
-    title_ja: titleData.ja ?? '',
-    title_en: titleData.en ?? '',
-    title_zh: titleData.zh ?? '',
-    Overview_ja: summaryData.ja?.overview ?? '',
-    Overview_en: summaryData.en?.overview ?? '',
-    Overview_zh: summaryData.zh?.overview ?? '',
-    Properties_ja: summaryData.ja?.properties ?? [],
-    Properties_en: summaryData.en?.properties ?? [],
-    Properties_zh: summaryData.zh?.properties ?? [],
+    title_ja: p.title_ja?.rich_text?.[0]?.plain_text ?? '',
+    title_en: p.title_en?.rich_text?.[0]?.plain_text ?? '',
+    title_zh: p.title_zh?.rich_text?.[0]?.plain_text ?? '',
+    Overview_ja: p.Overview_ja?.rich_text?.[0]?.plain_text ?? '',
+    Overview_en: p.Overview_en?.rich_text?.[0]?.plain_text ?? '',
+    Overview_zh: p.Overview_zh?.rich_text?.[0]?.plain_text ?? '',
+    Properties_ja: parsePropertiesField(p.Properties_ja),
+    Properties_en: parsePropertiesField(p.Properties_en),
+    Properties_zh: parsePropertiesField(p.Properties_zh),
     coverImage:
       page.cover?.external?.url ??
       page.cover?.file?.url ??
