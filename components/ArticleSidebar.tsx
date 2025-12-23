@@ -13,7 +13,13 @@ interface ArticleSidebarProps {
 }
 
 export function ArticleSidebar({ articles, currentArticleId, categoryName }: ArticleSidebarProps) {
-  const { dictionary } = useLanguage();
+  const { dictionary, locale } = useLanguage();
+
+  const getLocalizedTitle = (article: NotionArticle) => {
+    if (locale === 'ja') return article.title_ja;
+    if (locale === 'zh') return article.title_zh;
+    return article.title_en;
+  };
 
   return (
     <aside className="w-full lg:w-72 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800">
@@ -45,7 +51,7 @@ export function ArticleSidebar({ articles, currentArticleId, categoryName }: Art
                 )}
               >
                 <div className="line-clamp-2">
-                  {article.title}
+                  {getLocalizedTitle(article)}
                 </div>
                 {article.author && (
                   <div className={cn(

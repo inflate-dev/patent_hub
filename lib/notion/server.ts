@@ -101,19 +101,31 @@ export async function getNotionArticle(pageId: string): Promise<NotionArticle | 
 function parseNotionPage(page: any): NotionArticle {
   const p = page.properties;
 
+  const titleData = p.Title?.rich_text?.[0]?.plain_text ? JSON.parse(p.Title.rich_text[0].plain_text) : { ja: '', en: '', zh: '' };
+  const summaryData = p.Summary?.rich_text?.[0]?.plain_text ? JSON.parse(p.Summary.rich_text[0].plain_text) : {
+    ja: { overview: '', properties: [] },
+    en: { overview: '', properties: [] },
+    zh: { overview: '', properties: [] }
+  };
+
   return {
     id: page.id,
-    title: p.Title?.title?.[0]?.plain_text ?? '',
-    description: p.Description?.rich_text?.[0]?.plain_text ?? '',
-    content: p.Content?.rich_text?.[0]?.plain_text ?? '',
+    title_ja: titleData.ja ?? '',
+    title_en: titleData.en ?? '',
+    title_zh: titleData.zh ?? '',
+    Overview_ja: summaryData.ja?.overview ?? '',
+    Overview_en: summaryData.en?.overview ?? '',
+    Overview_zh: summaryData.zh?.overview ?? '',
+    Properties_ja: summaryData.ja?.properties ?? [],
+    Properties_en: summaryData.en?.properties ?? [],
+    Properties_zh: summaryData.zh?.properties ?? [],
     coverImage:
       page.cover?.external?.url ??
       page.cover?.file?.url ??
       'https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    publishedDate: p['Published Date']?.date?.start ?? '',
+    publishedDate: p.FilingDate?.date?.start ?? '',
     tags: p.Tags?.multi_select?.map((t: any) => t.name) ?? [],
-    author: p.Author?.rich_text?.[0]?.plain_text ?? '',
-    language: p.Language?.select?.name ?? '',
+    author: p.Applicant?.rich_text?.[0]?.plain_text ?? '',
     category: p.Category?.select?.name,
   };
 }

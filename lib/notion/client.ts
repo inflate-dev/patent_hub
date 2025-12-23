@@ -19,14 +19,19 @@ export function getMockArticles(category?: CategoryKey, locale?: string): Notion
   const articles: NotionArticle[] = [
     {
       id: '1',
-      title: 'Quantum Computing Patent Breakthrough',
-      description: 'A revolutionary approach to quantum error correction has been patented, promising to reduce computational errors significantly.',
-      content: 'Recent developments in quantum computing have led to a groundbreaking patent for error correction algorithms. This innovation promises to significantly reduce computational errors in quantum systems, making practical quantum computing more achievable.\n\nThe patent describes a novel method for detecting and correcting errors in quantum bits (qubits) without destroying their quantum state. This is crucial because quantum systems are extremely sensitive to environmental disturbances, and maintaining coherence is one of the biggest challenges in building practical quantum computers.\n\nThe new approach uses a combination of redundant encoding and real-time monitoring to identify errors as they occur. Unlike previous methods, this system can correct errors faster than they accumulate, potentially allowing quantum computers to perform complex calculations that were previously impossible.\n\nResearchers believe this breakthrough could accelerate the development of quantum computers capable of solving problems in cryptography, drug discovery, and materials science that are beyond the reach of classical computers.',
+      title_ja: '量子コンピューティング特許のブレークスルー',
+      title_en: 'Quantum Computing Patent Breakthrough',
+      title_zh: '量子计算专利突破',
+      Overview_ja: '量子エラー訂正への革新的なアプローチが特許取得され、計算エラーを大幅に削減することが期待されています。',
+      Overview_en: 'A revolutionary approach to quantum error correction has been patented, promising to reduce computational errors significantly.',
+      Overview_zh: '一种革命性的量子纠错方法已获得专利，有望显著减少计算错误。',
+      Properties_ja: ['量子ビットエラー訂正', 'リアルタイム監視システム', '冗長エンコーディング'],
+      Properties_en: ['Quantum bit error correction', 'Real-time monitoring system', 'Redundant encoding'],
+      Properties_zh: ['量子比特纠错', '实时监控系统', '冗余编码'],
       coverImage: 'https://images.pexels.com/photos/2599244/pexels-photo-2599244.jpeg?auto=compress&cs=tinysrgb&w=1200',
       publishedDate: '2025-12-01',
       tags: ['Quantum Computing', 'Innovation', 'Technology'],
       author: 'Dr. Sarah Chen',
-      language: 'en',
       category: 'carbon',
     },
   ];
@@ -35,10 +40,6 @@ export function getMockArticles(category?: CategoryKey, locale?: string): Notion
 
   if (category && category !== 'all') {
     filtered = filtered.filter(article => article.category === category);
-  }
-
-  if (locale) {
-    filtered = filtered.filter(article => article.language === locale);
   }
 
   return filtered.sort((a, b) => {

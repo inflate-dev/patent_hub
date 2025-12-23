@@ -20,6 +20,15 @@ export function ArticleCard({ article, locale }: ArticleCardProps) {
     }
   );
 
+  const getLocalizedField = (field: 'title' | 'Overview') => {
+    if (locale === 'ja') return article[`${field}_ja`];
+    if (locale === 'zh') return article[`${field}_zh`];
+    return article[`${field}_en`];
+  };
+
+  const title = getLocalizedField('title');
+  const overview = getLocalizedField('Overview');
+
   return (
     <Link href={`/articles/${article.id}`}>
       <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group">
@@ -27,7 +36,7 @@ export function ArticleCard({ article, locale }: ArticleCardProps) {
           <div className="relative w-full md:w-80 h-48 md:h-auto flex-shrink-0 overflow-hidden">
             <Image
               src={article.coverImage}
-              alt={article.title}
+              alt={title}
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-300"
               unoptimized
@@ -45,11 +54,11 @@ export function ArticleCard({ article, locale }: ArticleCardProps) {
               </div>
 
               <h2 className="text-2xl font-bold mb-3 group-hover:text-primary transition-colors line-clamp-2">
-                {article.title}
+                {title}
               </h2>
 
               <p className="text-muted-foreground mb-4 line-clamp-2">
-                {article.description}
+                {overview}
               </p>
             </div>
 

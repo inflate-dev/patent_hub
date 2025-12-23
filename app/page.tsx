@@ -45,17 +45,23 @@ export default function Home() {
 
   useEffect(() => {
     if (searchQuery) {
-      const filtered = articles.filter(
-        (article) =>
-          article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          article.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      const filtered = articles.filter((article) => {
+        const title = locale === 'ja' ? article.title_ja : locale === 'zh' ? article.title_zh : article.title_en;
+        const overview = locale === 'ja' ? article.Overview_ja : locale === 'zh' ? article.Overview_zh : article.Overview_en;
+        const properties = locale === 'ja' ? article.Properties_ja : locale === 'zh' ? article.Properties_zh : article.Properties_en;
+
+        return (
+          title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          overview.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          properties.some((prop) => prop.toLowerCase().includes(searchQuery.toLowerCase())) ||
           article.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase()))
-      );
+        );
+      });
       setFilteredArticles(filtered);
     } else {
       setFilteredArticles(articles);
     }
-  }, [searchQuery, articles]);
+  }, [searchQuery, articles, locale]);
 
   return (
     <MainLayout>

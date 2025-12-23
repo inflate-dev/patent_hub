@@ -115,6 +115,28 @@ export default function ArticlePage() {
     }
   );
 
+  const getLocalizedTitle = () => {
+    if (locale === 'ja') return article.title_ja;
+    if (locale === 'zh') return article.title_zh;
+    return article.title_en;
+  };
+
+  const getLocalizedOverview = () => {
+    if (locale === 'ja') return article.Overview_ja;
+    if (locale === 'zh') return article.Overview_zh;
+    return article.Overview_en;
+  };
+
+  const getLocalizedProperties = () => {
+    if (locale === 'ja') return article.Properties_ja;
+    if (locale === 'zh') return article.Properties_zh;
+    return article.Properties_en;
+  };
+
+  const title = getLocalizedTitle();
+  const overview = getLocalizedOverview();
+  const properties = getLocalizedProperties();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <div className="flex">
@@ -149,7 +171,7 @@ export default function ArticlePage() {
             <div className="relative w-full h-96">
               <Image
                 src={article.coverImage}
-                alt={article.title}
+                alt={title}
                 fill
                 className="object-cover"
                 unoptimized
@@ -167,11 +189,11 @@ export default function ArticlePage() {
               </div>
 
               <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-                {article.title}
+                {title}
               </h1>
 
               <p className="text-xl text-muted-foreground leading-relaxed">
-                {article.description}
+                {overview}
               </p>
 
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground pt-4 border-t">
@@ -189,11 +211,29 @@ export default function ArticlePage() {
 
             <CardContent className="pb-12">
               <div className="prose prose-lg dark:prose-invert max-w-none">
-                {article.content.split('\n\n').map((paragraph, index) => (
-                  <p key={index} className="mb-6 leading-relaxed text-foreground">
-                    {paragraph}
+                <div className="mb-8">
+                  <h2 className="text-2xl font-semibold mb-4">
+                    {locale === 'ja' ? '概要' : locale === 'zh' ? '概述' : 'Overview'}
+                  </h2>
+                  <p className="mb-6 leading-relaxed text-foreground">
+                    {overview}
                   </p>
-                ))}
+                </div>
+
+                {properties.length > 0 && (
+                  <div className="mb-8">
+                    <h2 className="text-2xl font-semibold mb-4">
+                      {locale === 'ja' ? '特性' : locale === 'zh' ? '特性' : 'Properties'}
+                    </h2>
+                    <ul className="list-disc list-inside space-y-2">
+                      {properties.map((property, index) => (
+                        <li key={index} className="leading-relaxed text-foreground">
+                          {property}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               {!user && (

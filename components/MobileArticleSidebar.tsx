@@ -16,8 +16,14 @@ interface MobileArticleSidebarProps {
 }
 
 export function MobileArticleSidebar({ articles, currentArticleId, categoryName }: MobileArticleSidebarProps) {
-  const { dictionary } = useLanguage();
+  const { dictionary, locale } = useLanguage();
   const [open, setOpen] = useState(false);
+
+  const getLocalizedTitle = (article: NotionArticle) => {
+    if (locale === 'ja') return article.title_ja;
+    if (locale === 'zh') return article.title_zh;
+    return article.title_en;
+  };
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -57,7 +63,7 @@ export function MobileArticleSidebar({ articles, currentArticleId, categoryName 
                   )}
                 >
                   <div className="line-clamp-2">
-                    {article.title}
+                    {getLocalizedTitle(article)}
                   </div>
                   {article.author && (
                     <div className={cn(
