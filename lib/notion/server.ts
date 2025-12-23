@@ -43,6 +43,12 @@ export async function fetchNotionArticles(
             : filters.length === 1
             ? filters[0]
             : { and: filters },
+        sorts: [
+          {
+            property: 'Published Date',
+            direction: 'descending',
+          },
+        ],
       }),
     }
   );

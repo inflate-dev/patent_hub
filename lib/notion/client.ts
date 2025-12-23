@@ -41,5 +41,7 @@ export function getMockArticles(category?: CategoryKey, locale?: string): Notion
     filtered = filtered.filter(article => article.language === locale);
   }
 
-  return filtered;
+  return filtered.sort((a, b) => {
+    return new Date(b.publishedDate).getTime() - new Date(a.publishedDate).getTime();
+  });
 }
