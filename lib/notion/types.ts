@@ -13,7 +13,8 @@ export interface NotionArticle {
   Properties_zh: string[];
   coverImage: string;
   publishedDate: string;
+  title_number: string;
   tags: string[];
-  author: string;
+  Applicant: string;
   category: CategoryKey;
 }

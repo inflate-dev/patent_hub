@@ -199,7 +199,7 @@ export default function ArticlePage() {
               <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground pt-4 border-t">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  <span className="font-medium">{article.author}</span>
+                  <span className="font-medium">{article.Applicant}</span>
                 </div>
                 <span>•</span>
                 <div className="flex items-center gap-2">

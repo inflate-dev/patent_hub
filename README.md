@@ -41,7 +41,7 @@ A modern, multilingual patent article aggregation website built with Next.js, Su
 ### Article Display
 
 - **Home Page**: Single-column layout with horizontal article cards
-- **Card Content**: Cover image, title, summary, publication date, author, tags
+- **Card Content**: Cover image, title, summary, publication date, Applicant, tags
 - **Article Detail**: Full-screen article view with rich content
 - **Gradient Backgrounds**: Soft, professional gradient backgrounds throughout
 
@@ -92,7 +92,7 @@ If you want to use real Notion data instead of mock data:
      - `Content` (Text) - Full article body
      - `Published Date` (Date)
      - `Tags` (Multi-select)
-     - `Author` (Text)
+     - `Applicant` (Text)
      - `Language` (Select: en, ja, zh)
    - Add a cover image to each page (optional)
 
@@ -208,7 +208,7 @@ Row Level Security (RLS) policies ensure users can only access their own data.
 The application includes comprehensive mock patent article data in multiple languages with:
 - Cover images from Pexels
 - Detailed descriptions and full article content
-- Realistic metadata (authors, dates, tags)
+- Realistic metadata (Applicant, dates, tags)
 - Mixed language content (English, Japanese, Chinese)
 
 When Notion credentials are not configured, the app automatically uses mock data.

@@ -65,12 +65,12 @@ export function MobileArticleSidebar({ articles, currentArticleId, categoryName 
                   <div className="line-clamp-2">
                     {getLocalizedTitle(article)}
                   </div>
-                  {article.author && (
+                  {article.Applicant && (
                     <div className={cn(
                       'text-xs mt-1',
                       isActive ? 'text-primary-foreground/80' : 'text-muted-foreground'
                     )}>
-                      {article.author}
+                      {article.Applicant}
                     </div>
                   )}
                 </Link>

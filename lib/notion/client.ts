@@ -30,8 +30,9 @@ export function getMockArticles(category?: CategoryKey, locale?: string): Notion
       Properties_zh: ['量子比特纠错', '实时监控系统', '冗余编码'],
       coverImage: 'https://images.pexels.com/photos/2599244/pexels-photo-2599244.jpeg?auto=compress&cs=tinysrgb&w=1200',
       publishedDate: '2025-12-01',
+      title_number: '2025-12-01',
       tags: ['Quantum Computing', 'Innovation', 'Technology'],
-      author: 'Dr. Sarah Chen',
+      Applicant: 'Dr. Sarah Chen',
       category: 'carbon',
     },
   ];

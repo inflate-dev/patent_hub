@@ -31,7 +31,7 @@ export async function fetchNotionArticles(
         filter,
         sorts: [
           {
-            property: 'FilingDate',
+            property: 'Published Date',
             direction: 'descending',
           },
         ],
@@ -87,31 +87,36 @@ export async function getNotionArticle(pageId: string): Promise<NotionArticle | 
 function parseNotionPage(page: any): NotionArticle {
   const p = page.properties;
 
+  const rt = (x: any) => x?.rich_text?.[0]?.plain_text ?? "";
+  const title = (x: any) => x?.title?.[0]?.plain_text ?? "";
   const parsePropertiesField = (field: any): string[] => {
-    if (!field) return [];
-    const text = field.rich_text?.[0]?.plain_text ?? '';
-    if (!text) return [];
-    return text.split('\n').filter((line: string) => line.trim() !== '');
+    const text = rt(field);
+    return text ? text.split("\n").map((s: string) => s.trim()).filter(Boolean) : [];
   };
+
+  const coverUrl = p["coverImage"]?.url ?? "";
 
   return {
     id: page.id,
-    title_ja: p.title_ja?.rich_text?.[0]?.plain_text ?? '',
-    title_en: p.title_en?.rich_text?.[0]?.plain_text ?? '',
-    title_zh: p.title_zh?.rich_text?.[0]?.plain_text ?? '',
-    Overview_ja: p.Overview_ja?.rich_text?.[0]?.plain_text ?? '',
-    Overview_en: p.Overview_en?.rich_text?.[0]?.plain_text ?? '',
-    Overview_zh: p.Overview_zh?.rich_text?.[0]?.plain_text ?? '',
-    Properties_ja: parsePropertiesField(p.Properties_ja),
-    Properties_en: parsePropertiesField(p.Properties_en),
-    Properties_zh: parsePropertiesField(p.Properties_zh),
+    title_en: title(p["Title"]),
+    title_ja: rt(p["Title_ja"]),
+    title_zh: rt(p["Title_zh"]),
+    Overview_ja: rt(p["Overview_ja"]),
+    Overview_en: rt(p["Overview_en"]),
+    Overview_zh: rt(p["Overview_zh"]),
+    Properties_ja: parsePropertiesField(p["Properties_ja"]),
+    Properties_en: parsePropertiesField(p["Properties_en"]),
+    Properties_zh: parsePropertiesField(p["Properties_zh"]),
+    Applicant: rt(p["Applicant"]),
+    category: p["Category"]?.select?.name,
+    tags: p["Tags"]?.multi_select?.map((t: any) => t.name) ?? [],
+
+    // ✅ 日付列は "Published Date"
+    publishedDate: p["Published Date"]?.date?.start ?? "",
+    // ✅ title_number は専用列
+    title_number: rt(p["title_number"]),
     coverImage:
-      page.cover?.external?.url ??
-      page.cover?.file?.url ??
-      'https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=1200',
-    publishedDate: p.FilingDate?.date?.start ?? '',
-    tags: p.Tags?.multi_select?.map((t: any) => t.name) ?? [],
-    author: p.Applicant?.rich_text?.[0]?.plain_text ?? '',
-    category: p.Category?.select?.name,
+      coverUrl ||
+      "https://images.pexels.com/photos/8386440/pexels-photo-8386440.jpeg?auto=compress&cs=tinysrgb&w=1200",
   };
 }
