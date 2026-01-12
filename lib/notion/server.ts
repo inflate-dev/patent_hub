@@ -74,13 +74,13 @@ export async function getNotionArticle(pageId: string): Promise<NotionArticle | 
     const data = await response.json();
     const page = data.results.find((page: any) => page.id === pageId);
     if (!page) {
-      return null;
+      return getMockArticles().find((a) => a.id === pageId) || null;
     }
 
     return parseNotionPage(page);
   } catch (error) {
     console.error('Error fetching page from Notion:', error);
-    return null;
+    return getMockArticles().find((a) => a.id === pageId) || null;
   }
 }
 
