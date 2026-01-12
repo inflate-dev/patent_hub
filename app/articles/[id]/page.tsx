@@ -168,18 +168,18 @@ export default function ArticlePage() {
             </div>
 
             <Card className="overflow-hidden">
-            <div className="relative w-full h-96">
-              <Image
-                src={article.coverImage}
-                alt={title}
-                fill
-                className="object-cover"
-                unoptimized
-                priority
-              />
-            </div>
+              <div className="relative w-full h-96">
+                <Image
+                  src={article.coverImage}
+                  alt={title}
+                  fill
+                  className="object-cover"
+                  unoptimized
+                  priority
+                />
+              </div>
 
-            <CardHeader className="space-y-6 pt-8">
+              <CardHeader className="space-y-6 pt-8">
               <div className="flex flex-wrap gap-2">
                 {article.tags.map((tag) => (
                   <Badge key={tag} variant="secondary">
@@ -252,8 +252,8 @@ export default function ArticlePage() {
                   </div>
                 </div>
               )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
